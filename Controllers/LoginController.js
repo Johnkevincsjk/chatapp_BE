@@ -1,5 +1,6 @@
-const bcrypt = require('bcryptjs/dist/bcrypt')
+const bcrypt = require('bcryptjs')
 const Usermodels = require('../models/UserSchema')
+const generateToken = require('../Config/generateToken')
 
 const LoginRoute = (async (req, res) => {
 
@@ -7,16 +8,17 @@ const LoginRoute = (async (req, res) => {
         const user_data = req.body
         const { Email, Password } = user_data
 
-        const user_mail = await Usermodels.findOne({ Email: Email })
-
-
-        if (user_mail.Email === Email) {
+        const user_mail = await Usermodels.findOne({ Email })
+        if (user_mail) {
 
             if (bcrypt.compareSync(Password, user_mail.Password)) {
 
                 return res.status(200).json({
                     Feedback: 'Log-in Successfully',
-                    Success: true
+                    Success: true,
+                    user_mail,
+                    isAdmin: user_mail.isAdmin,
+                    token: generateToken(user_mail._id)
                 })
 
             } else {

@@ -1,4 +1,5 @@
 
+const generateToken = require('../Config/generateToken');
 const Usermodels = require('../models/UserSchema')
 const bcrypt = require('bcryptjs');
 const salt = bcrypt.genSaltSync(10);
@@ -10,7 +11,7 @@ const SigninController = (async (req, res) => {
         const { Email, Name } = resgister_user
         const user_exist = await Usermodels.findOne({ Email: Email })
         if (user_exist) {
-            // If user exists, check if the username is also taken
+
             return res.status(409).json({
                 Feedback: "Email already registered",
             });
@@ -27,13 +28,11 @@ const SigninController = (async (req, res) => {
             return res.status(200).json({
                 Feedback: "User created successfully",
                 success: true,
-                UserData
+                UserData,
+                token: generateToken(UserData._id)
+                
             })
         }
-
-
-
-
     } catch (error) {
         res.status(500).json({
             Feedback: "Something Went wrong",
